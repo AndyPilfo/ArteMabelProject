@@ -1,0 +1,10 @@
+import 'dotenv/config'; import { connectDb } from './config/db.js'; import User from './models/User.js'; import Product from './models/Product.js'; import Review from './models/Review.js';
+const products = [
+  ['Queque de chocolate', 'Queque húmedo de cacao, cubierto con ganache artesanal.', 14500, 'queques', ['Chocolate', 'Popular'], 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1000&q=80'],
+  ['Galletas con chispas', 'Galletas caseras, suaves al centro y crujientes por fuera.', 6500, 'galletas', ['Chocolate', 'Casero'], 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=1000&q=80'],
+  ['Pan de banano', 'Pan artesanal de banano maduro y canela.', 7500, 'panes', ['Casero', 'Sin nueces'], 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=1000&q=80'],
+  ['Cheesecake de frutos rojos', 'Cremoso cheesecake con salsa de frutos rojos.', 16000, 'postres', ['Popular', 'Cumpleaños'], 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?auto=format&fit=crop&w=1000&q=80'],
+  ['Caja de bocadillos dulces', 'Selección personalizable para celebrar.', 18500, 'otros', ['Personalizable', 'Cumpleaños'], 'https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=1000&q=80']
+];
+async function seed() { await connectDb(); await Promise.all([Review.deleteMany(), Product.deleteMany(), User.deleteMany()]); const admin = await User.create({ name: 'Administradora DEMO', email: 'admin@artemabel.demo', password: 'AdminDemo123!', role: 'admin' }); const client = await User.create({ name: 'Cliente DEMO', email: 'cliente@artemabel.demo', password: 'ClienteDemo123!' }); const created = await Product.insertMany(products.map(([name, description, price, category, tags, image]) => ({ name, description, price, category, tags, image }))); await Review.create({ user: client._id, product: created[0]._id, rating: 5, comment: 'Delicioso y muy fresco.' }); console.log(`Seed complete. Admin: ${admin.email} / AdminDemo123!`); process.exit(0); }
+seed().catch(err => { console.error(err); process.exit(1); });
